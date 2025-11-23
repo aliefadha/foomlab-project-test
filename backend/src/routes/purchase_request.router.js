@@ -4,6 +4,7 @@ import PurchaseRequestController from '../controllers/purchase_request.controlle
 const router = express.Router();
 
 router.post('/', PurchaseRequestController.create);
+router.get('/', PurchaseRequestController.getAll);
 router.put('/:id', PurchaseRequestController.edit);
 router.delete('/:id', PurchaseRequestController.delete);
 

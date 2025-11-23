@@ -6,12 +6,15 @@ class WebhookService {
         const transaction = await sequelize.transaction();
 
         try {
-            if (webhookData.data.vendor == "PT FOOM LAB GLOBAL") {
-                throw new Error('Invalid Vendor');
+            if (webhookData.status_request !== 'DONE') {
+                return {
+                    message: 'Status Request Confirm Accepted',
+                    status: webhookData.status_request
+                };
             }
 
             const purchaseRequest = await PurchaseRequest.findOne({
-                where: { reference: webhookData.data.reference },
+                where: { reference: webhookData.reference },
                 transaction
             });
 
@@ -36,7 +39,6 @@ class WebhookService {
                 transaction
             });
 
-            //Assuming webhooks only trigger the products on the this project database
             if (products.length !== items.length) {
                 throw new Error('Product not found');
             }
@@ -51,6 +53,7 @@ class WebhookService {
             });
 
             const newStocks = [];
+            const updatedStocks = [];
 
             for (const item of items) {
                 const product = products.find(p => p.sku === item.sku_barcode);
@@ -64,6 +67,7 @@ class WebhookService {
                     });
                 } else {
                     stock.quantity += item.qty;
+                    updatedStocks.push(stock);
                 }
             }
 
@@ -71,7 +75,7 @@ class WebhookService {
                 await Stock.bulkCreate(newStocks, { transaction });
             }
 
-            await Promise.all(stocks.map(stock => stock.save({ transaction })));
+            await Promise.all(updatedStocks.map(stock => stock.save({ transaction })));
 
             purchaseRequest.status = 'COMPLETE';
             await purchaseRequest.save({ transaction });

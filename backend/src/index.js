@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import sequelize from './config/sequelize.js';
 import warehouseRouter from './routes/warehouse.router.js';
 import stockRouter from './routes/stock.router.js';
@@ -12,6 +13,7 @@ const port = process.env.PORT;
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.json({ message: 'API is running' });

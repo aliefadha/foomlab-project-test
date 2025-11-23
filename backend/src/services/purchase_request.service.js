@@ -23,6 +23,39 @@ class PurchaseRequestService {
         return `PR${String(nextNumber).padStart(5, '0')}`;
     }
 
+    static async findAll() {
+        const purchaseRequests = await PurchaseRequest.findAll({
+            include: [
+                {
+                    model: PurchaseRequestItem,
+                    as: 'purchase_request_item',
+                    include: [
+                        {
+                            model: Product,
+                            as: 'product'
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['purchase_request_id', 'product_id']
+                    }
+                },
+                {
+                    model: Warehouse,
+                    as: 'warehouse'
+                }
+            ],
+            attributes: {
+                exclude: ['warehouse_id']
+            }
+        });
+
+        return purchaseRequests.map(pr => {
+            const prJson = pr.toJSON();
+            prJson.quantity = prJson.purchase_request_item.reduce((sum, item) => sum + item.quantity, 0);
+            return prJson;
+        });
+    }
+
     static async create(data) {
         if (!data.warehouse_id) {
             throw new Error('warehouse_id is required');

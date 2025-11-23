@@ -12,7 +12,23 @@ class PurchaseRequestController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                message: error.message || "An error occurred while retrieving warehouses",
+                message: error.message || "An error occurred while retrieving purchases",
+            });
+        }
+    }
+
+    static async getAll(req, res) {
+        try {
+            const purchaseRequest = await PurchaseRequestService.findAll();
+            res.status(200).json({
+                success: true,
+                data: purchaseRequest,
+                message: "retrieved successfully",
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message || "An error occurred while retrieving purchases",
             });
         }
     }
@@ -37,7 +53,7 @@ class PurchaseRequestController {
             }
 
             if (error.message.includes('already completed')) {
-                return res.status(400).json({
+                return res.status(409).json({
                     success: false,
                     message: 'This purchase request has already been processed',
                     error: error.message
@@ -68,7 +84,7 @@ class PurchaseRequestController {
             }
 
             if (error.message === 'purchase request status is not draft') {
-                return res.status(400).json({
+                return res.status(409).json({
                     success: false,
                     message: 'Cannot delete purchase request. Status must be DRAFT',
                 });

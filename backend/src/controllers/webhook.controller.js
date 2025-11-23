@@ -3,10 +3,26 @@ import WebhookService from '../services/webhook.service.js';
 class WebhookController {
     static async receiveStock(req, res) {
         try {
-            if (req.body.data?.event_type === 'ping' || req.body.data?.event === 'test') {
+            if (req.body.event_type === 'ping' || req.body.event === 'test') {
                 return res.status(200).json({
                     success: true,
                     message: 'Ping received'
+                });
+            }
+
+            if (req.body.status_request === 'REQUEST_CONFIRM') {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Purchase request confirmed by vendor',
+                    reference: req.body.reference
+                });
+            }
+
+            if (req.body.status_request === 'REQUEST_REJECTED') {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Purchase request rejected by vendor',
+                    reference: req.body.reference
                 });
             }
 
