@@ -109,7 +109,6 @@ The application will be available at `http://localhost:3000`
 ### Products
 
 - `GET /products` - List all products
-- `POST /products` - Create a new product
 
 ### Stocks
 
